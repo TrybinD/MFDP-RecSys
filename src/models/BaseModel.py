@@ -26,9 +26,9 @@ class BaseRecommendModel(RecommendationModelInterface):
 
         books_top = (interaction_data.query('sourse == "books"')['item']
                           .value_counts())
-        films_top = (interaction_data.query('sourse == "books"')['item']
+        films_top = (interaction_data.query('sourse == "films"')['item']
                           .value_counts())
-        kion_top = (interaction_data.query('sourse == "books"')['item']
+        kion_top = (interaction_data.query('sourse == "kion"')['item']
                           .value_counts())
 
         self.books_top = books_top.index.values
@@ -48,25 +48,34 @@ class BaseRecommendModel(RecommendationModelInterface):
 
             if source == 'books':
                 rec = self.books_top[bfk_counter[0]]
+                bfk_counter[0] += 1
                 if rec not in user_history:
                     recommendation.append(rec)
                     i += 1
-                    bfk_counter[0] += 1
             elif source == 'films':
-                rec = self.books_top[bfk_counter[1]]
+                rec = self.films_top[bfk_counter[1]]
+                bfk_counter[1] += 1
                 if rec not in user_history:
                     recommendation.append(rec)
                     i += 1
-                    bfk_counter[1] += 1
             elif source == 'kion':
-                rec = self.books_top[bfk_counter[2]]
+                rec = self.kion_top[bfk_counter[2]]
+                bfk_counter[2] += 1
                 if rec not in user_history:
                     recommendation.append(rec)
                     i += 1
-                    bfk_counter[2] += 1
 
         return recommendation
 
     def recommend(self, users, n_to_recommend, *args, **kwargs):
         recommendations = []
         base_recommendations = self.recommend_single('', n_to_recommend)
+        for user in users:
+            if user not in self.history:
+                print('2')
+                recommendations.append(base_recommendations)
+            else:
+                recommendations.append(self.recommend_single(user, n_to_recommend))
+
+        return recommendations
+
