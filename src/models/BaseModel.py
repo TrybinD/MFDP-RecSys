@@ -13,69 +13,52 @@ class RecommendationModelInterface(ABC):
         pass
 
     @abstractmethod
-    def recommend(self, users, n_to_recommend, *args, **kwargs):
+    def recommend(self, user, n_to_recommend, *args, **kwargs):
         pass
 
 
 class BaseRecommendModel(RecommendationModelInterface):
-    def fit(self, interaction_data, *args, **kwargs):
+    def fit(self, interaction_data, top_size=100, *args, **kwargs):
         if 'history' in kwargs:
-            self.history = kwargs['history'].to_dict()['item']
+            self.history = kwargs['history']['item'].str.split(', ').to_dict()
         else:
             self.history = {}
 
-        books_top = (interaction_data.query('sourse == "books"')['item']
-                          .value_counts())
-        films_top = (interaction_data.query('sourse == "films"')['item']
-                          .value_counts())
-        kion_top = (interaction_data.query('sourse == "kion"')['item']
-                          .value_counts())
+        top = (interaction_data
+               .groupby(['sourse', 'item'])
+               .agg({'interaction_type': ['count', 'sum']}))
 
-        self.books_top = books_top.index.values
-        self.films_top = films_top.index.values
-        self.kion_top = kion_top.index.values
+        self.top_dict = {i: {j: (top
+                                 .sort_values(('interaction_type', j), ascending=False)
+                                 .loc[i]
+                                 .index.values[:top_size]) for j in ['sum', 'count']} for i in ['books', 'kion']}
 
-        self.bfk_rate = np.array([books_top.values.sum(), films_top.values.sum(), kion_top.values.sum()])
-        self.bfk_rate = self.bfk_rate/self.bfk_rate.sum()
+        ratio = top.groupby(level=0).agg('sum')['interaction_type']
 
-    def recommend_single(self, user, n_to_recommend, *args, **kwargs):
-        bfk_counter = [0, 0, 0]
-        recommendation = []
-        user_history = self.history.get(user, '')
-        i = 0
-        while i <= n_to_recommend:
-            source = np.random.choice(['books', 'films', 'kion'], p=self.bfk_rate)
+        self.ratio_dict = {i: ratio[i].values/ratio[i].sum() for i in ['sum', 'count']}
 
-            if source == 'books':
-                rec = self.books_top[bfk_counter[0]]
-                bfk_counter[0] += 1
-                if rec not in user_history:
-                    recommendation.append(rec)
-                    i += 1
-            elif source == 'films':
-                rec = self.films_top[bfk_counter[1]]
-                bfk_counter[1] += 1
-                if rec not in user_history:
-                    recommendation.append(rec)
-                    i += 1
-            elif source == 'kion':
-                rec = self.kion_top[bfk_counter[2]]
-                bfk_counter[2] += 1
-                if rec not in user_history:
-                    recommendation.append(rec)
-                    i += 1
+    def recommend(self, user, n_to_recommend,
+                  top_type='sum', ratio_type='count', use_history=True,
+                  *args, **kwargs):
 
+        recommendation = np.random.choice(['books', 'kion'],
+                                          size=n_to_recommend,
+                                          p=self.ratio_dict[ratio_type])
+        if not use_history:
+            mask = (recommendation == 'books')
+            n_books = sum(mask)
+            n_kion = n_to_recommend - n_books
+            recommendation[mask] = self.top_dict['books'][top_type][:n_books]
+            recommendation[~mask] = self.top_dict['kion'][top_type][:n_kion]
+            return recommendation
+
+        user_history = self.history.get(user, [])
+        mask = (recommendation == 'books')
+        n_books = sum(mask)
+        n_kion = n_to_recommend - n_books
+        recommendation[mask] = (self.top_dict['books'][top_type][~np.isin(self.top_dict['books'][top_type],
+                                                                          user_history)][:n_books])
+        recommendation[~mask] = (self.top_dict['kion'][top_type][~np.isin(self.top_dict['kion'][top_type],
+                                                                          user_history)][:n_kion])
         return recommendation
-
-    def recommend(self, users, n_to_recommend, *args, **kwargs):
-        recommendations = []
-        base_recommendations = self.recommend_single('', n_to_recommend)
-        for user in users:
-            if user not in self.history:
-                print('2')
-                recommendations.append(base_recommendations)
-            else:
-                recommendations.append(self.recommend_single(user, n_to_recommend))
-
-        return recommendations
 
