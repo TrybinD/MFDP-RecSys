@@ -25,7 +25,7 @@ class BaseRecommendModel(RecommendationModelInterface):
             self.history = {}
 
         top = (interaction_data
-               .groupby(['sourse', 'item'])
+               .groupby(['source', 'item'])
                .agg({'interaction_type': ['count', 'sum']}))
 
         self.top_dict = {i: {j: (top
