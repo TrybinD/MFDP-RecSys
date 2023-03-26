@@ -3,3 +3,6 @@
 .csv
 /.ipynb_checkpoints
 /.idea
+
+!data\books_bd.parquet
+!data\kion_bd.parquet
