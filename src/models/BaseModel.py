@@ -38,12 +38,12 @@ class BaseRecommendModel(RecommendationModelInterface):
         self.ratio_dict = {i: ratio[i].values/ratio[i].sum() for i in ['sum', 'count']}
 
     def recommend(self, user, n_to_recommend,
-                  top_type='sum', ratio_type='count', use_history=True,
+                  top_type='sum', ratio_type='count', use_history=True, user_history=None,
                   *args, **kwargs):
 
         recommendation = np.random.choice(['books', 'kion'],
                                           size=n_to_recommend,
-                                          p=self.ratio_dict[ratio_type])
+                                          p=self.ratio_dict[ratio_type]).astype(object)
         if not use_history:
             mask = (recommendation == 'books')
             n_books = sum(mask)
@@ -52,7 +52,8 @@ class BaseRecommendModel(RecommendationModelInterface):
             recommendation[~mask] = self.top_dict['kion'][top_type][:n_kion]
             return recommendation
 
-        user_history = self.history.get(user, [])
+        if user_history is None:
+            user_history = self.history.get(user, [])
         mask = (recommendation == 'books')
         n_books = sum(mask)
         n_kion = n_to_recommend - n_books
