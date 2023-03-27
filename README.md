@@ -3,7 +3,7 @@
 
 Участник: Трубин Даниил Олегович
 
-MVP: -
+MVP: https://trybind-mfdp-recsys-main-z5amqv.streamlit.app/
 
 ## 1. Данные и концепция
 ### Концепция
