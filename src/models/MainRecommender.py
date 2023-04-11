@@ -18,7 +18,7 @@ class RecommendModel(RecommendationModelInterface):
         self.domain_recommender = domain_recommender
         self.atom_models_dict = atom_models_dict
 
-    def fit(self):
+    def fit(self, interaction_data, *args, **kwargs):
         pass
 
     def recommend(self, user_history, n_to_recommend, *args, **kwargs):

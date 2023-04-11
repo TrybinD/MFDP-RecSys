@@ -26,7 +26,7 @@ class AdaptiveDomainRecommender(RecommendationModelInterface):
         self.domains = domains
         self.prior_alpha = prior_alpha if not None else [1 for _ in domains]
 
-    def fit(self, *args, **kwargs):
+    def fit(self, interaction_data, *args, **kwargs):
         pass
 
     def recommend(self, user_history, n_to_recommend, mode='bayesian', *args, **kwargs):
