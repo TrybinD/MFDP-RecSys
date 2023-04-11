@@ -1,6 +1,5 @@
 from abc import ABC, abstractmethod
 
-import pandas as pd
 import numpy as np
 
 
@@ -9,11 +8,11 @@ class RecommendationModelInterface(ABC):
         pass
 
     @abstractmethod
-    def fit(self, interaction_data, *args, **kwargs):
+    def fit(self, *args, **kwargs):
         pass
 
     @abstractmethod
-    def recommend(self, user, n_to_recommend, *args, **kwargs):
+    def recommend(self, *args, **kwargs):
         pass
 
 
