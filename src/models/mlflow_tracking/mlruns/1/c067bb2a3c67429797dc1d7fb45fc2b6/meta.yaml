@@ -1,0 +1,16 @@
+artifact_uri: file:///C:/Users/trybi/PycharmProjects/MFDP-RecSys/src/models/mlflow_tracking/mlruns/1/c067bb2a3c67429797dc1d7fb45fc2b6/artifacts
+deleted_time: 1681418274368
+end_time: 1681418198606
+entry_point_name: ''
+experiment_id: '1'
+lifecycle_stage: deleted
+run_id: c067bb2a3c67429797dc1d7fb45fc2b6
+run_name: Top count recommends
+run_uuid: c067bb2a3c67429797dc1d7fb45fc2b6
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1681418197586
+status: 3
+tags: []
+user_id: trybi

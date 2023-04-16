@@ -18,10 +18,10 @@ class RecommendationModelInterface(ABC):
 
 class TopRecommender(RecommendationModelInterface):
 
-    def fit(self, interaction_data, n_to_save=100, *args, **kwargs):
+    def fit(self, interaction_data, n_to_save=100, metric='count', *args, **kwargs):
         self. top_dict = (interaction_data
                           .groupby('item')
-                          .agg({'rating': 'mean'})
+                          .agg({'rating': metric})
                           .sort_values('rating')
                           .iloc[-n_to_save:]
                           .to_dict()['rating'])
@@ -35,7 +35,7 @@ class TopRecommender(RecommendationModelInterface):
                                     replace=False)
         elif mode == 'deterministic':
             recs = np.array(sorted(self.top_dict,
-                                   key=self.top_dict.get)[:n_to_recommend+len(user_history)])
+                                   key=self.top_dict.get)[-(n_to_recommend+len(user_history)):])
 
         recs = recs[~np.isin(recs, user_history)][-n_to_recommend:]
         return recs[::-1]

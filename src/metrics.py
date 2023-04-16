@@ -1,3 +1,5 @@
+import numpy as np
+
 def average_precision(actual, recommended):
     ap_sum = 0
     hits = 0
@@ -9,8 +11,8 @@ def average_precision(actual, recommended):
 
 
 def average_single_precision(actual, recommended):
+    idx = np.where(recommended == actual)[0] + 1
 
-    for i, product_id in enumerate(recommended):
-        if product_id in actual:
-            return 1 / ((i + 1)*len(recommended))
+    if idx:
+        return 1/((idx.item())*len(recommended))
     return 0

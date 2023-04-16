@@ -2,7 +2,7 @@ import numpy as np
 from scipy import sparse
 from sklearn.preprocessing import normalize
 
-from BaseModel import RecommendationModelInterface
+from .BaseModel import RecommendationModelInterface
 
 
 class CosineDistanceRecommender(RecommendationModelInterface):
@@ -19,8 +19,9 @@ class CosineDistanceRecommender(RecommendationModelInterface):
 
     def recommend(self, user_history, n_to_recommend, mode='probabilistic', *args, **kwargs):
         book_id = np.where(np.isin(self.cols, user_history))[0]
-        a = np.array(self.simularity[book_id].sum(axis=0))
+        a = np.abs(np.array(self.simularity[book_id].sum(axis=0)))
         if mode == 'probabilistic':
+            if a.sum() == 0: a = np.ones_like(a)
             recs = np.random.choice(self.cols, p=(a[0]/a.sum()),
                                     size=(n_to_recommend+len(book_id)),
                                     replace=False)[::-1]

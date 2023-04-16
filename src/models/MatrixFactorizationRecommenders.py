@@ -11,6 +11,7 @@ class ALSBasedRecommender(RecommendationModelInterface):
 
     def fit(self, interaction_data, *args, **kwargs):
 
+        self.max_rating = interaction_data['rating'].max()
 
         self.rows, r_pos = np.unique(interaction_data['user'].values, return_inverse=True)
         self.cols, c_pos = np.unique(interaction_data['item'].values, return_inverse=True)
@@ -24,8 +25,8 @@ class ALSBasedRecommender(RecommendationModelInterface):
     def recommend(self, user_history, n_to_recommend, *args, **kwargs):
         book_id = np.where(np.isin(self.cols, user_history))[0]
 
-        # Будем считать, что добавление в избранное == поставил 10 баллов книге
-        sp_row = sparse.coo_matrix(([10 for _ in book_id], ([0 for _ in book_id], book_id)),
+        # Будем считать, что добавление в избранное == поставил максимальный рейтинг
+        sp_row = sparse.coo_matrix(([self.max_rating for _ in book_id], ([0 for _ in book_id], book_id)),
                                    shape=(1, len(self.cols)))
         recs = self.model.recommend(0, sp_row.tocsr(), recalculate_user=True, N=n_to_recommend)[0]
 
