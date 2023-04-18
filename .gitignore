@@ -1,8 +1,11 @@
 
 .parquet
 .csv
+.pickle
 /.ipynb_checkpoints
 /.idea
 
 !data\books_bd.parquet
-!data\kion_bd.parquet
+!data\films_bd.parquet
+!data\series_bd.parquet
+!src\models_storage\*

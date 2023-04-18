@@ -1,0 +1,15 @@
+artifact_uri: file:///C:/Users/trybi/PycharmProjects/MFDP-RecSys/src/models/mlflow_tracking/mlruns/2/6da082beb64c4d18892fadda105ce8ea/artifacts
+end_time: 1681635588016
+entry_point_name: ''
+experiment_id: '2'
+lifecycle_stage: active
+run_id: 6da082beb64c4d18892fadda105ce8ea
+run_name: ALS Recommender + changed DS
+run_uuid: 6da082beb64c4d18892fadda105ce8ea
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1681635578908
+status: 3
+tags: []
+user_id: trybi

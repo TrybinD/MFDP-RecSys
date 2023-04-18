@@ -1,0 +1,15 @@
+artifact_uri: file:///C:/Users/trybi/PycharmProjects/MFDP-RecSys/src/models/mlflow_tracking/mlruns/3/e4c3e1feb5e148c6bdb7a69a76a3c473/artifacts
+end_time: 1681634993524
+entry_point_name: ''
+experiment_id: '3'
+lifecycle_stage: active
+run_id: e4c3e1feb5e148c6bdb7a69a76a3c473
+run_name: Random recommends
+run_uuid: e4c3e1feb5e148c6bdb7a69a76a3c473
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1681634992545
+status: 3
+tags: []
+user_id: trybi
