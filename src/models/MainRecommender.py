@@ -1,5 +1,6 @@
-from BaseModel import RecommendationModelInterface
 from typing import Dict
+
+from .BaseModel import RecommendationModelInterface
 
 
 class RecommendModel(RecommendationModelInterface):
@@ -28,6 +29,7 @@ class RecommendModel(RecommendationModelInterface):
         for rec_type, rec_model in self.atom_models_dict.items():
             mask = (recommendation == rec_type)
             n_in_mask = sum(mask)
-            recommendation[mask] = rec_model.recommend(user_history, n_in_mask)
+            if n_in_mask > 0:
+                recommendation[mask] = rec_model.recommend(user_history, n_in_mask, mode='deterministic')
 
         return recommendation

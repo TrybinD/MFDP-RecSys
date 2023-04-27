@@ -24,7 +24,7 @@ class AdaptiveDomainRecommender(RecommendationModelInterface):
                  prior_alpha=None):
         super().__init__()
         self.domains = domains
-        self.prior_alpha = prior_alpha if not None else [1 for _ in domains]
+        self.prior_alpha = prior_alpha if prior_alpha is not None else [1 for _ in domains]
 
     def fit(self, interaction_data, *args, **kwargs):
         pass

@@ -1,54 +1,69 @@
 import os
 from PIL import Image
+from pathlib import Path
 
 import pandas as pd
 
 import streamlit as st
 from streamlit_option_menu import option_menu
 
-from new_recommendation import new_recommendation
-from favorites import favorites
+from src.site_utils.data_extract import read_data
+from src.site_utils.site_components import Sidebar
 
-pages_dict = {'Новые рекомендации': new_recommendation,
-              'Избранное': favorites}
-
-
-icon = Image.open(os.path.join('utils', 'logo.jpeg'))
-st.set_page_config(layout="wide", page_title='LifeStyle', page_icon=icon)
-
-
-@st.cache
-def read_data():
-    data_books = pd.read_parquet(os.path.join('data', 'books_bd.parquet'))
-    data_kion = pd.read_parquet(os.path.join('data', 'kion_bd.parquet'))
-    return data_books, data_kion
-
-
-data_books, data_kion = read_data()
-
-
-def create_sidebar():
-    with st.sidebar:
-        st.image(icon, width=200)
-        st.title('LifeStyle')
-        page = option_menu('Выберите лист', list(pages_dict.keys()), menu_icon="table")
-    return page
-
-
-if 'favorites' not in st.session_state:
-    st.session_state['favorites'] = []
+from new_recommendation import NewRecommendationPage
+from favorites import FavoritesPage
+from search import SearchPage
 
 
 if __name__ == '__main__':
-    st.markdown("""
-                <style>
-                       .css-hxt7ib {
-                        padding-top: 1rem;
-                        padding-left: 1rem;
-                        padding-right: 1rem;
-                    }
-                </style>
-                """, unsafe_allow_html=True)
 
-    page = create_sidebar()
-    pages_dict[page](data_books, data_kion)
+    # Настраиваем возможные странички
+    pages_dict = {'Новые рекомендации': NewRecommendationPage(),
+                  'Избранное': FavoritesPage(),
+                  'Поиск': SearchPage()}
+
+    # Настраиваем добавленное в избранное - изменится с аутентификацией
+    if 'favorites' not in st.session_state:
+        st.session_state['favorites'] = []
+
+    # Загружаем изображения
+    icon = Image.open(Path('utils/logo.jpeg'))
+
+    # Настраиваем параметры страницы
+    st.set_page_config(layout="wide", page_title='LifeStyle', page_icon=icon)
+    st.markdown("""
+                    <style>
+                           .css-hxt7ib {
+                            padding-top: 1rem;
+                            padding-left: 1rem;
+                            padding-right: 1rem;
+                        }
+                    </style>
+                    """, unsafe_allow_html=True)
+
+
+
+    # Считываем данные из "БД"
+    books_data_path = Path('data/books_bd.parquet')
+    books_data = read_data(books_data_path)
+
+    films_data_path = Path('data/films_bd.parquet')
+    films_data = read_data(films_data_path)
+
+    series_data_path = str(Path('data/series_bd.parquet'))
+    series_data = read_data(series_data_path)
+
+    habr_data_path = str(Path('data/habr_posts.parquet'))
+    habr_data = read_data(habr_data_path)
+
+    data_dict = {'b': books_data,
+                 'f': films_data,
+                 's': series_data,
+                 'h': habr_data}
+
+
+    # Создаем sidebar
+    sidebar = Sidebar(list(pages_dict.keys()), icon)
+
+    # Отрисовываем выбранную страничку
+    pages_dict[sidebar.page].render(data_dict)
