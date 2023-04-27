@@ -13,8 +13,7 @@ class FavoritesPage(Page):
 
         self.show_favorites(st.session_state['favorites'], data_dict, select_only=domains)
 
-    @staticmethod
-    def show_favorites(favorites, data_dict, n_cards_per_row=1, select_only=None):
+    def show_favorites(self, favorites, data_dict, n_cards_per_row=1, select_only=None):
 
         if select_only is not None:
             favorites = [f for f in favorites if f[0] in select_only]
@@ -28,3 +27,10 @@ class FavoritesPage(Page):
 
             with cols[n_col]:
                 card = create_item_card(item, data_dict)
+
+                card.button('Удалить из избранного', key=f'drop_item_{item}',
+                            on_click=self.drop_favorites, args=(item,))
+
+    @staticmethod
+    def drop_favorites(item):
+        st.session_state['favorites'].remove(item)

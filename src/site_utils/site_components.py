@@ -3,12 +3,15 @@ from abc import ABC, abstractmethod
 import streamlit as st
 from streamlit_option_menu import option_menu
 
+from src.site_utils.authenticate import Authenticate
+
 
 class Sidebar:
-    def __init__(self, pages_names: list, icon: object):
+    def __init__(self, pages_names: list, icon: object, side_bar_name='LifeStyle'):
         with st.sidebar:
-            st.image(icon, width=200)
-            st.title('LifeStyle')
+            if icon:
+                st.image(icon, width=200)
+            st.title(side_bar_name)
             self.page = option_menu('Выберите лист', pages_names, menu_icon="table")
 
 
@@ -110,3 +113,15 @@ def additional_choice(preselected=()):
             domains_mask[i] = col.checkbox(domain_name, value=domains_mask[i])
 
     return [d for d, mask in zip(domains, domains_mask) if mask]
+
+
+def create_authenticate(user_data_path):
+    auth = Authenticate(user_data_path)
+
+    if not st.session_state['authentication_status']:
+        auth_sidebar = Sidebar(['Вход', 'Регистрация'], None, 'Вход или Регистрация')
+
+        if auth_sidebar.page == "Вход":
+            auth.login()
+        elif auth_sidebar.page == "Регистрация":
+            auth.register_user()
