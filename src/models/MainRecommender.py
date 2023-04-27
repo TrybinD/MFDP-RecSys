@@ -24,7 +24,8 @@ class RecommendModel(RecommendationModelInterface):
 
     def recommend(self, user_history, n_to_recommend, *args, **kwargs):
 
-        recommendation = self.domain_recommender.recommend(user_history, n_to_recommend)
+        recommendation = self.domain_recommender.recommend(user_history, n_to_recommend,
+                                                           *args, **kwargs)
 
         for rec_type, rec_model in self.atom_models_dict.items():
             mask = (recommendation == rec_type)

@@ -78,3 +78,35 @@ def render_habr_post(item, data):
     st.write(content['tags'].item())
     st.write(content['url'].item())
 
+
+def create_time_based_domain_filter():
+
+    available_time = st.selectbox('Сколько у Вас свободного времени?',
+                                  ['Много - можно фильм посмотреть или что-то почитать',
+                                   'Не очень много - может на одну серию хватит',
+                                   'Еду в метро - хотел бы что-то почитать',
+                                   'Буквально 15 минут - хватит на статью'])
+
+    selected_domains = {'Много - можно фильм посмотреть или что-то почитать': ['b', 'f', 's', 'h'],
+                        'Не очень много - может на одну серию хватит': ['s', 'b', 'h'],
+                        'Еду в метро - хотел бы что-то почитать': ['b', 'h'],
+                        'Буквально 15 минут - хватит на статью': ['h']}[available_time]
+
+    selected_domains = additional_choice(preselected=selected_domains)
+
+    return selected_domains
+
+
+def additional_choice(preselected=()):
+    domains = ['b', 'f', 's', 'h']
+    if preselected:
+        domains_mask = [d in preselected for d in domains]
+    else:
+        domains_mask = [True for d in domains]
+
+    with st.expander('Дополнительный выбор'):
+        cols = st.columns(4)
+        for i, (col, domain_name) in enumerate(zip(cols, ['Книги', 'Фильмы', 'Сериалы', 'Статьи'])):
+            domains_mask[i] = col.checkbox(domain_name, value=domains_mask[i])
+
+    return [d for d, mask in zip(domains, domains_mask) if mask]

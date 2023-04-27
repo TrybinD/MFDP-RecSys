@@ -1,6 +1,6 @@
 import streamlit as st
 
-from src.site_utils.site_components import Page, create_item_card
+from src.site_utils.site_components import Page, create_item_card, additional_choice
 
 
 class SearchPage(Page):
@@ -13,18 +13,18 @@ class SearchPage(Page):
 
         text_to_search = st.text_input('Введите название или автора')
 
+        domains = additional_choice()
 
         if text_to_search:
-            finds = self.search_in_data(text_to_search, data_dict)
+            finds = self.search_in_data(text_to_search, data_dict, select_only=domains)
 
 
             self.show_finds(finds, data_dict)
 
     @staticmethod
-    def search_in_data(text_to_search, data_dict):
+    def search_in_data(text_to_search, data_dict, select_only=None):
 
         finds = []
-
 
         # Поиск в Книгах по названию
         finds.extend(
@@ -75,6 +75,9 @@ class SearchPage(Page):
                 .str.lower()
                 .str.contains(text_to_search.lower())])['id'].values
         )
+
+        if select_only is not None:
+            finds = [f for f in finds if f[0] in select_only]
 
         return finds
 

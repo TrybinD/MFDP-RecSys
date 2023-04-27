@@ -4,39 +4,39 @@ import pickle
 import streamlit as st
 import pandas as pd
 
-from src.site_utils.site_components import Page, create_item_card
+from src.site_utils.site_components import Page, create_item_card, create_time_based_domain_filter
 from src.models.MainRecommender import RecommendModel
 from src.models.ContentBasedRecommenders import TagsBasedRecommender
 from src.models.DomainRecommender import AdaptiveDomainRecommender
 
-# Загружаем модели для рекомендации фильмов, книг и сериалов
-models_path = Path('src/models/models_storage')
-
-with open(models_path / 'books_model_1.pickle', 'rb') as f:
-    books_model = pickle.load(f)
-
-with open(models_path / 'films_model_1.pickle', 'rb') as f:
-    films_model = pickle.load(f)
-
-with open(models_path / 'series_model.pickle', 'rb') as f:
-    series_model = pickle.load(f)
-
-# Обучаем модель рекомендации статей
-posts_model = TagsBasedRecommender()
-posts_model.fit(pd.read_parquet(Path('data/habr_posts.parquet')).rename({'id': 'item'}, axis=1))
-
-# Инициализируем модель для доменов
-domain_model = AdaptiveDomainRecommender(['b', 'f', 's', 'h'])
-
-# Собираем полную модель
-model = RecommendModel(domain_model,
-                       {'b': books_model,
-                        'f': films_model,
-                        's': series_model,
-                        'h': posts_model})
-
 
 class NewRecommendationPage(Page):
+    def __init__(self):
+        # Загружаем модели для рекомендации фильмов, книг и сериалов
+        models_path = Path('src/models/models_storage')
+
+        with open(models_path / 'books_model_1.pickle', 'rb') as f:
+            books_model = pickle.load(f)
+
+        with open(models_path / 'films_model_1.pickle', 'rb') as f:
+            films_model = pickle.load(f)
+
+        with open(models_path / 'series_model.pickle', 'rb') as f:
+            series_model = pickle.load(f)
+
+        # Обучаем модель рекомендации статей
+        posts_model = TagsBasedRecommender()
+        posts_model.fit(pd.read_parquet(Path('data/habr_posts.parquet')).rename({'id': 'item'}, axis=1))
+
+        # Инициализируем модель для доменов
+        domain_model = AdaptiveDomainRecommender(['b', 'f', 's', 'h'])
+
+        # Собираем полную модель
+        self.model = RecommendModel(domain_model,
+                                    {'b': books_model,
+                                     'f': films_model,
+                                     's': series_model,
+                                     'h': posts_model})
 
     def render(self, data_dict: dict, **kwargs):
 
@@ -44,7 +44,10 @@ class NewRecommendationPage(Page):
 
         st.title('New recommendation')
 
-        recommendations = model.recommend(st.session_state['favorites'], 20)
+        domains = create_time_based_domain_filter()
+
+        recommendations = self.model.recommend(st.session_state['favorites'], 20,
+                                               select_only=domains)
 
         self.show_results(recommendations, data_dict)
 
