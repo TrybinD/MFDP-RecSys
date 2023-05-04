@@ -102,4 +102,7 @@ class SearchPage(Page):
         for i, flag in st.session_state.items():
             if i.startswith('add_item_'):  # Ключи кнопок для добавления должны начинаться с add_item_
                 if flag:
-                    st.session_state['favorites'].append(i[9:])
+                    if st.session_state['favorites']:
+                        st.session_state['favorites'].append(i[9:])
+                    else:
+                        st.session_state['favorites'] = [i[9:]]
