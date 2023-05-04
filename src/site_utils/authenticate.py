@@ -24,7 +24,7 @@ class Authenticate:
         login_form = st.form('Login')
 
         login_form.subheader('Вход')
-        user = login_form.text_input('Username').lower()
+        user = login_form.text_input('Username')
         password = login_form.text_input('Password', type='password')
 
         if login_form.form_submit_button('Login'):
@@ -48,9 +48,11 @@ class Authenticate:
                 st.session_state['authentication_status'] = True
                 st.session_state['favorites'] = user_data[user]['favorites'].split(', ')
                 st.experimental_rerun()
+            else:
+                st.session_state['authentication_status'] = False
+                st.warning(f'Неверный пароль')
         else:
-            st.session_state['authentication_status'] = False
-            st.warning('Неверный пароль')
+            st.warning(f'Такого пользователя нет')
 
     def register_user(self):
         """
