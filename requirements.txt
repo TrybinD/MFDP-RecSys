@@ -2,4 +2,8 @@ numpy <= 1.21
 pandas
 streamlit-option-menu
 streamlit
-yaml
+pyyaml
+scikit-learn
+scipy
+implicit
+pillow

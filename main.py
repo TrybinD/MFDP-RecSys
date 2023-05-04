@@ -1,11 +1,8 @@
-import os
 from PIL import Image
 from pathlib import Path
 
-import pandas as pd
 
 import streamlit as st
-from streamlit_option_menu import option_menu
 
 from src.site_utils.data_utils import read_data, reload_favorites
 from src.site_utils.site_components import Sidebar, create_authenticate
