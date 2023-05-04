@@ -8,4 +8,5 @@
 !data\books_bd.parquet
 !data\films_bd.parquet
 !data\series_bd.parquet
+!data\habr_posts.parquet
 !src\models_storage\*

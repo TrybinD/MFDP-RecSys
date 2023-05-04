@@ -1,33 +1,36 @@
 import streamlit as st
 
-
-def favorites(*args, N_cards_per_row = 1):
-    data_books, data_kion = args
-    st.title('Favorites')
-
-    for n_row, r in enumerate(st.session_state['favorites']):
-        i = n_row % N_cards_per_row
-        if i == 0:
-            st.write("---")
-            cols = st.columns(N_cards_per_row, gap="large")
-
-        if r[0] == 'b':
-            isbn = r[1:]
-            content = data_books.query('ISBN == @isbn')
-            if len(content) == 0:
-                continue
-            with cols[n_row % N_cards_per_row]:
-                st.caption('book')
-                st.markdown(f"**{content['Book-Title'].item()}**")
-                st.image(content['Image-URL-M'].item())
+from src.site_utils.site_components import Page, create_item_card, create_time_based_domain_filter
 
 
-        elif r[0] == 'k':
-            item_id = int(r[1:])
-            content = data_kion.query('item_id == @item_id')
-            if len(content) == 0:
-                continue
-            with cols[n_row % N_cards_per_row]:
-                st.caption(f'{content["content_type"].item()}')
-                st.markdown(f"**{content['title'].item()}**")
+class FavoritesPage(Page):
 
+    def render(self, data_dict: dict, **kwargs):
+
+        st.title('Favorites')
+
+        domains = create_time_based_domain_filter()
+
+        self.show_favorites(st.session_state['favorites'], data_dict, select_only=domains)
+
+    def show_favorites(self, favorites, data_dict, n_cards_per_row=1, select_only=None):
+
+        if select_only is not None:
+            favorites = [f for f in favorites if f[0] in select_only]
+
+        for i, item in enumerate(favorites):
+            n_col = i % n_cards_per_row
+
+            if n_col == 0:
+                st.write("---")
+                cols = st.columns(n_cards_per_row)
+
+            with cols[n_col]:
+                card = create_item_card(item, data_dict)
+
+                card.button('Удалить из избранного', key=f'drop_item_{item}',
+                            on_click=self.drop_favorites, args=(item,))
+
+    @staticmethod
+    def drop_favorites(item):
+        st.session_state['favorites'].remove(item)

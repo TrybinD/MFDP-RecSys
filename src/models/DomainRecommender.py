@@ -20,18 +20,20 @@ class PopularDomainRecommender(RecommendationModelInterface):
 
 
 class AdaptiveDomainRecommender(RecommendationModelInterface):
-    def __init__(self, domains: list,
-                 prior_alpha=None):
+    def __init__(self, domains: list):
         super().__init__()
         self.domains = domains
-        self.prior_alpha = prior_alpha if not None else [1 for _ in domains]
 
     def fit(self, interaction_data, *args, **kwargs):
         pass
 
-    def recommend(self, user_history, n_to_recommend, mode='bayesian', *args, **kwargs):
-        posterior_alpha = self.prior_alpha.copy()
-        for i, domain in enumerate(self.domains):
+    def recommend(self, user_history, n_to_recommend, mode='bayesian', select_only=None,
+                  *args, **kwargs):
+
+        domains = select_only if select_only is not None else self.domains
+
+        posterior_alpha = [1 for _ in domains]
+        for i, domain in enumerate(domains):
             for item in user_history:
                 if item[0] == domain[0]:  # Код домена и его названия начинаются с одной буквы
                     posterior_alpha[i] += 1
@@ -41,6 +43,6 @@ class AdaptiveDomainRecommender(RecommendationModelInterface):
         elif mode == 'frequency':
             p = np.array(posterior_alpha)/sum(posterior_alpha)
 
-        return np.random.choice(self.domains,
+        return np.random.choice(domains,
                                 p=p,
                                 size=(n_to_recommend,)).astype('<U20')

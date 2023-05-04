@@ -1,0 +1,16 @@
+
+.ipynb_checkpoint
+data
+!data/books_bd.parquet
+!data/films_bd.parquet
+!data/habr_posts.parquet
+!data/series_bd.parquet
+!data/user_data.yaml
+
+datasesets
+
+notebooks
+
+src/models/mlflow_tracking
+
+
