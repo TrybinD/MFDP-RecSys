@@ -15,7 +15,7 @@ from search import SearchPage
 if __name__ == '__main__':
 
     # Загружаем изображения
-    icon = Image.open(Path('utils/logo.jpeg'))
+    icon = Image.open(Path('imgs/logo.jpeg'))
 
     # Настраиваем параметры страницы
     st.set_page_config(layout="wide", page_title='LifeStyle', page_icon=icon)
