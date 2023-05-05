@@ -68,3 +68,47 @@ Streamlit Cloud предлогает свой довольно удобный х
 
 
 ## <a name="components">2. Взаимодействие компонент</a> 
+
+### 2.1 Взаимодействие ML компонентов
+
+Здесь я еще раз опишу предпологаемую схему взаимодействия классов моделей, но уже с красивыми схемами. 
+
+Есть один общий абстрактный класс RecommendationModelInterface, который определяет интерфейс всех моделей и 3 типа его подклассов:
+1. Классы для рекомендации item: TopRecommender, CosineDistanceRecommender, ALSBasedRecommender, LightFMBasedRecommender, TagsBasedRecommender
+
+Они обучаются на раздельных датасетах и рекомендуют только в рамках своего domain
+
+2. Классы для рекомендации домена: PopularDomainRecommender, AdaptiveDomainRecommender
+
+Они решают какой домен порекомендовать на какой позиции. По факту определяют сколько каждого из доменов будет в рекомендации
+
+3. Мета-класс для рекомендации по нескольким доменам: RecommendModel
+
+Формирует окончательную рекомендацию.
+
+Схема взаимодействия классов (Надеюсь не накосячил и более менее понятно отрисовал. Я только потихоньку учу паттерны):
+
+```mermaid
+
+classDiagram
+
+class RecommendationModelInterface
+    RecommendationModelInterface : fit(interaction_data, *args, **kwargs)
+    RecommendationModelInterface : recommend(user_history, n_to_recommend, *args, **kwargs)
+    
+class RecommendModel
+    RecommendModel : domain_recommender domain_recommenders
+    RecommendModel : atom_models_dict dict(domain - item_recommenders)
+
+RecommendationModelInterface <|-- item_recommenders : Наследование
+RecommendationModelInterface <|-- domain_recommenders : Наследование
+RecommendationModelInterface <|-- RecommendModel : Наследование
+
+RecommendModel o-- item_recommenders : Аггрегация
+RecommendModel o-- domain_recommenders : Аггрегация
+
+```
+
+### 2.2 Работа frontend компонентов
+
+
