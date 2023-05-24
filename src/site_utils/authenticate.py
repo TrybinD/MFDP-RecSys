@@ -7,7 +7,7 @@ import streamlit as st
 
 class Authenticate:
     """
-    This class will create login, logout, register user widgets.
+    Этот класс создает виджет аутентификации.
     """
     def __init__(self, user_data_path: Path):
         self.user_data_path = user_data_path
@@ -36,7 +36,7 @@ class Authenticate:
 
     def _check_credentials(self, user, password):
         """
-        Checks the validity of the entered credentials.
+        Проверяет логин пароль.
         """
 
         with open(str(self.user_data_path)) as file:
@@ -56,7 +56,7 @@ class Authenticate:
 
     def register_user(self):
         """
-        Creates a password reset widget.
+        Создает виджет регистрации.
         """
         with open(str(self.user_data_path)) as file:
             user_data = yaml.load(file, Loader=SafeLoader)
